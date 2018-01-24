@@ -1,7 +1,7 @@
 ﻿# Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Karolis Balza](https://up.htmlacademy.ru/javascript/12/user/66586).
-* Наставник: Екатерина Кащенко.
+* Наставник: Екатерина Кащенко https://htmlacademy.ru/profile/id109008.
 
 ---
 
