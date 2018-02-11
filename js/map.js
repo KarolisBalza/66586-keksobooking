@@ -1,4 +1,5 @@
 'use strict';
+var ESC_KEYCODE = 27;
 var OFFERS_COUNT = 8;
 var AVATAR_HEIGHT = 40;
 var AVATAR_WIDTH = 40;
@@ -25,8 +26,7 @@ var mainPin = document.querySelector('.map__pin--main');
 mainPin.addEventListener('mouseup', function () {
   activatePage();
   enableFieldsets();
-  getRandomOffers();
-  renderPins();
+  showPins();
 });
 
 var disableFieldsets = function () {
@@ -151,6 +151,8 @@ var getRandomOffers = function () {
   }
 };
 
+getRandomOffers();
+
 
 var renderPins = function () {
   var template = document.querySelector('.map__pins');
@@ -165,6 +167,8 @@ var renderPins = function () {
   }
   template.appendChild(fragment);
 };
+
+renderPins();
 
 
 var renderCard = function (offerNumber) {
@@ -208,10 +212,16 @@ var renderPictures = function (offerNumber) {
 };
 
 var showPinInfo = function (offerNumber) {
+  var mapCard = document.querySelector('.map__card');
+  if (map.contains(mapCard)) {
+    mapCard.remove();
+  }
   var cardFragment = document.createDocumentFragment();
   cardFragment.appendChild(renderCard(offerNumber));
-  document.querySelector('.map').insertBefore(cardFragment, document.querySelector('.map__filters-container'));
+  map.insertBefore(cardFragment, document.querySelector('.map__filters-container'));
 };
+
+showPinInfo(0);
 
 var allPins = document.querySelector('.map__pins');
 
@@ -220,3 +230,44 @@ allPins.onclick = function (evt) {
     showPinInfo(evt.path[1].getAttribute('pin-number'));
   }
 };
+
+var hidePopup = function () {
+  var popup = document.querySelector('.map__card');
+  popup.classList.add('hidden');
+};
+
+hidePopup();
+
+
+var hidePins = function () {
+  var pins = document.querySelectorAll('.map__pin');
+  for (var i = 0; i < pins.length; i++) {
+    if (!pins[i].classList.contains('map__pin--main')) {
+      pins[i].classList.add('hidden');
+    }
+  }
+};
+
+var showPins = function () {
+  var pins = document.querySelectorAll('.map__pin');
+  for (var i = 0; i < pins.length; i++) {
+    if (!pins[i].classList.contains('map__pin--main')) {
+      pins[i].classList.remove('hidden');
+    }
+  }
+};
+
+hidePins();
+
+map.addEventListener('click', function (evt) {
+  document.querySelector('popup__close');
+  if (evt.target.classList.contains('popup__close')) {
+    hidePopup();
+  }
+});
+
+map.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    hidePopup();
+  }
+});
