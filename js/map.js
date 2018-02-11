@@ -1,4 +1,5 @@
 'use strict';
+var ESC_KEYCODE = 27;
 var OFFERS_COUNT = 8;
 var AVATAR_HEIGHT = 40;
 var AVATAR_WIDTH = 40;
@@ -21,9 +22,34 @@ var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditio
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var randomOffers = [];
 
+var mainPin = document.querySelector('.map__pin--main');
+mainPin.addEventListener('mouseup', function () {
+  activatePage();
+  enableFieldsets();
+  showPins();
+});
+
+var disableFieldsets = function () {
+  var fieldsets = document.querySelectorAll('.notice__form fieldset');
+  for (var i = 0; i < fieldsets.length; i++) {
+    fieldsets[i].setAttribute('disabled', true);
+  }
+};
+
+var enableFieldsets = function () {
+  var fieldsets = document.querySelectorAll('.notice__form fieldset');
+  for (var i = 0; i < fieldsets.length; i++) {
+    fieldsets[i].removeAttribute('disabled');
+  }
+};
+
+disableFieldsets();
+
+var activatePage = function () {
+  map.classList.remove('map--faded');
+};
 
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
 
 var getRandomAvatar = function () {
   var randomIndex = Math.floor(Math.random() * AVATARS.length);
@@ -53,27 +79,28 @@ var getRandomFeatures = function () {
 
 var getRandomType = function () {
   var randomType = TYPES[Math.floor(Math.random() * TYPES.length)];
-  if (randomType === 'flat') {
-    randomType = 'Квартира';
-  } else if (randomType === 'bungalo') {
-    randomType = 'Бунгало';
-  } else {
-    randomType = 'Дом';
+  switch (randomType) {
+    case ('flat'):
+      randomType = 'Квартира';
+      break;
+    case ('bungalo'):
+      randomType = 'Бунгало';
+      break;
+    case ('house'):
+      randomType = 'Дом';
+      break;
   }
   return randomType;
 };
 
-var getShuffledPhotos = function (a) {
-  var j;
-  var x;
-  var i;
-  for (i = a.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    x = a[i];
-    a[i] = a[j];
-    a[j] = x;
+var getShuffledPhotos = function () {
+  for (var i = PHOTOS.length - 1; i > 0; i--) {
+    var randomIndex = Math.floor(Math.random() * (i + 1));
+    var lastPhoto = PHOTOS[i];
+    PHOTOS[i] = PHOTOS[randomIndex];
+    PHOTOS[randomIndex] = lastPhoto;
   }
-  return a;
+  return PHOTOS;
 };
 
 var renderOffer = function () {
@@ -88,7 +115,7 @@ var renderOffer = function () {
   var checkin = CHECK_IN[getRandomIndex(CHECK_IN.length)];
   var checkout = CHECK_OUT[getRandomIndex(CHECK_OUT.length)];
   var features = getRandomFeatures();
-  var photos = getShuffledPhotos(PHOTOS);
+  var photos = getShuffledPhotos();
   var info =
   {
     'author': {
@@ -126,6 +153,7 @@ var getRandomOffers = function () {
 
 getRandomOffers();
 
+
 var renderPins = function () {
   var template = document.querySelector('.map__pins');
   var similarElement = document.querySelector('template').content.querySelector('.map__pin');
@@ -134,6 +162,7 @@ var renderPins = function () {
     var element = similarElement.cloneNode(true);
     element.querySelector('img').setAttribute('src', randomOffers[i].author.avatar);
     element.setAttribute('style', 'left: ' + (randomOffers[i].location.x - AVATAR_WIDTH / 2) + 'px; ' + 'top:' + (randomOffers[i].location.y - AVATAR_HEIGHT) + 'px');
+    element.setAttribute('pin-number', i);
     fragment.appendChild(element);
   }
   template.appendChild(fragment);
@@ -142,39 +171,39 @@ var renderPins = function () {
 renderPins();
 
 
-var renderCard = function () {
+var renderCard = function (offerNumber) {
   var similarCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
   var cardElement = similarCardTemplate.cloneNode(true);
-  cardElement.querySelector('img').setAttribute('src', randomOffers[0].author.avatar);
-  cardElement.querySelector('h3').textContent = randomOffers[0].offer.title;
-  cardElement.querySelector('p small').textContent = randomOffers[0].offer.address;
-  cardElement.querySelector('.popup__price').textContent = randomOffers[0].offer.price;
-  cardElement.querySelector('h4').textContent = randomOffers[0].offer.type;
-  cardElement.querySelector('h4 + p').textContent = randomOffers[0].offer.rooms + randomOffers[0].offer.guests;
-  cardElement.querySelector('h4 + p + p').textContent = randomOffers[0].offer.checkin + randomOffers[0].offer.checkout;
+  cardElement.querySelector('img').setAttribute('src', randomOffers[offerNumber].author.avatar);
+  cardElement.querySelector('h3').textContent = randomOffers[offerNumber].offer.title;
+  cardElement.querySelector('p small').textContent = randomOffers[offerNumber].offer.address;
+  cardElement.querySelector('.popup__price').textContent = randomOffers[offerNumber].offer.price;
+  cardElement.querySelector('h4').textContent = randomOffers[offerNumber].offer.type;
+  cardElement.querySelector('h4 + p').textContent = randomOffers[offerNumber].offer.rooms + randomOffers[offerNumber].offer.guests;
+  cardElement.querySelector('h4 + p + p').textContent = randomOffers[offerNumber].offer.checkin + randomOffers[offerNumber].offer.checkout;
   cardElement.querySelector('.popup__features').innerHTML = '';
-  cardElement.querySelector('.popup__features').appendChild(renderFeatures());
-  cardElement.querySelector('ul + p').textContent = randomOffers[0].offer.description;
-  cardElement.querySelector('.popup__pictures').appendChild(renderPictures());
+  cardElement.querySelector('.popup__features').appendChild(renderFeatures(offerNumber));
+  cardElement.querySelector('ul + p').textContent = randomOffers[offerNumber].offer.description;
+  cardElement.querySelector('.popup__pictures').appendChild(renderPictures(offerNumber));
   return cardElement;
 };
 
-var renderFeatures = function () {
+var renderFeatures = function (offerNumber) {
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < randomOffers[0].offer.features.length; i++) {
+  for (var i = 0; i < randomOffers[offerNumber].offer.features.length; i++) {
     var newElement = document.createElement('li');
-    newElement.className = 'feature feature--' + randomOffers[0].offer.features[i];
+    newElement.className = 'feature feature--' + randomOffers[offerNumber].offer.features[i];
     fragment.appendChild(newElement);
   }
   return fragment;
 };
 
 
-var renderPictures = function () {
+var renderPictures = function (offerNumber) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < 3; i++) {
     var similarElement = document.querySelector('template').content.querySelector('.popup__pictures li').cloneNode(true);
-    similarElement.querySelector('img').setAttribute('src', randomOffers[0].offer.photos[i]);
+    similarElement.querySelector('img').setAttribute('src', randomOffers[offerNumber].offer.photos[i]);
     similarElement.querySelector('img').setAttribute('height', 60);
     similarElement.querySelector('img').setAttribute('width', 60);
     fragment.appendChild(similarElement);
@@ -182,6 +211,63 @@ var renderPictures = function () {
   return fragment;
 };
 
-var cardFragment = document.createDocumentFragment();
-cardFragment.appendChild(renderCard(randomOffers[0]));
-document.querySelector('.map').insertBefore(cardFragment, document.querySelector('.map__filters-container'));
+var showPinInfo = function (offerNumber) {
+  var mapCard = document.querySelector('.map__card');
+  if (map.contains(mapCard)) {
+    mapCard.remove();
+  }
+  var cardFragment = document.createDocumentFragment();
+  cardFragment.appendChild(renderCard(offerNumber));
+  map.insertBefore(cardFragment, document.querySelector('.map__filters-container'));
+};
+
+showPinInfo(0);
+
+var allPins = document.querySelector('.map__pins');
+
+allPins.onclick = function (evt) {
+  if (evt.path[1].hasAttribute('pin-number')) {
+    showPinInfo(evt.path[1].getAttribute('pin-number'));
+  }
+};
+
+var hidePopup = function () {
+  var popup = document.querySelector('.map__card');
+  popup.classList.add('hidden');
+};
+
+hidePopup();
+
+
+var hidePins = function () {
+  var pins = document.querySelectorAll('.map__pin');
+  for (var i = 0; i < pins.length; i++) {
+    if (!pins[i].classList.contains('map__pin--main')) {
+      pins[i].classList.add('hidden');
+    }
+  }
+};
+
+var showPins = function () {
+  var pins = document.querySelectorAll('.map__pin');
+  for (var i = 0; i < pins.length; i++) {
+    if (!pins[i].classList.contains('map__pin--main')) {
+      pins[i].classList.remove('hidden');
+    }
+  }
+};
+
+hidePins();
+
+map.addEventListener('click', function (evt) {
+  document.querySelector('popup__close');
+  if (evt.target.classList.contains('popup__close')) {
+    hidePopup();
+  }
+});
+
+map.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    hidePopup();
+  }
+});
