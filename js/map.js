@@ -23,10 +23,12 @@ var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.g
 var randomOffers = [];
 
 var mainPin = document.querySelector('.map__pin--main');
-mainPin.addEventListener('mouseup', function () {
+mainPin.addEventListener('mouseup', function (evt) {
+  var address = document.querySelector('#address');
   activatePage();
   enableFieldsets();
   showPins();
+  address.value = (evt.clientX + ', ' + evt.clientY);
 });
 
 var disableFieldsets = function () {
@@ -37,7 +39,9 @@ var disableFieldsets = function () {
 };
 
 var enableFieldsets = function () {
-  var fieldsets = document.querySelectorAll('.notice__form fieldset');
+  var form = document.querySelector('.notice__form');
+  var fieldsets = form.querySelectorAll('.notice__form fieldset');
+  form.classList.remove('notice__form--disabled');
   for (var i = 0; i < fieldsets.length; i++) {
     fieldsets[i].removeAttribute('disabled');
   }
@@ -225,11 +229,11 @@ showPinInfo(0);
 
 var allPins = document.querySelector('.map__pins');
 
-allPins.onclick = function (evt) {
+allPins.addEventListener('click', function (evt) {
   if (evt.path[1].hasAttribute('pin-number')) {
     showPinInfo(evt.path[1].getAttribute('pin-number'));
   }
-};
+});
 
 var hidePopup = function () {
   var popup = document.querySelector('.map__card');
@@ -270,4 +274,120 @@ map.addEventListener('keydown', function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     hidePopup();
   }
+});
+
+var homeType = document.querySelector('#type');
+
+homeType.addEventListener('change', function () {
+  var homePrice = document.querySelector('#price');
+  switch (homeType.value) {
+    case 'flat':
+      homePrice.setAttribute('min', 1000);
+      break;
+    case 'bungalo':
+      homePrice.setAttribute('min', 0);
+      break;
+    case 'house':
+      homePrice.setAttribute('min', 5000);
+      break;
+    case 'palace':
+      homePrice.setAttribute('min', 10000);
+      break;
+  }
+});
+
+var roomNumber = document.querySelector('#room_number');
+
+roomNumber.addEventListener('change', function () {
+  var capacity = document.querySelector('#capacity');
+  var threeGuests = capacity[0];
+  var twoGuests = capacity[1];
+  var oneGuest = capacity[2];
+  var notForGuests = capacity[3];
+  switch (roomNumber.value) {
+    case '1':
+      threeGuests.setAttribute('disabled', true);
+      twoGuests.setAttribute('disabled', true);
+      oneGuest.removeAttribute('disabled');
+      notForGuests.setAttribute('disabled', true);
+
+      break;
+    case '2':
+      threeGuests.setAttribute('disabled', true);
+      twoGuests.removeAttribute('disabled');
+      oneGuest.removeAttribute('disabled');
+      notForGuests.setAttribute('disabled', true);
+      break;
+    case '3':
+      threeGuests.removeAttribute('disabled');
+      twoGuests.removeAttribute('disabled');
+      oneGuest.removeAttribute('disabled');
+      notForGuests.setAttribute('disabled', true);
+      break;
+    case '100':
+      threeGuests.setAttribute('disabled', true);
+      twoGuests.setAttribute('disabled', true);
+      oneGuest.setAttribute('disabled', true);
+      notForGuests.removeAttribute('disabled');
+      break;
+  }
+});
+
+var checkinTime = document.querySelector('#timein');
+checkinTime.addEventListener('change', function () {
+  checkinTime = document.querySelector('#timein');
+  switch (checkinTime.value) {
+    case '12:00':
+      checkoutTime.selectedIndex = 0;
+      break;
+    case '13:00':
+      checkoutTime.selectedIndex = 1;
+      break;
+    case '14:00':
+      checkoutTime.selectedIndex = 2;
+      break;
+  }
+});
+
+var checkoutTime = document.querySelector('#timeout');
+checkoutTime.addEventListener('change', function () {
+  switch (checkoutTime.value) {
+    case '12:00':
+      checkinTime.selectedIndex = 0;
+      break;
+    case '13:00':
+      checkinTime.selectedIndex = 1;
+      break;
+    case '14:00':
+      checkinTime.selectedIndex = 2;
+      break;
+  }
+});
+
+var capacity = document.querySelector('#capacity');
+capacity.addEventListener('change', function () {
+  capacity.setCustomValidity('');
+});
+
+var submitButton = document.querySelector('.form__submit');
+
+submitButton.addEventListener('click', function () {
+  var guestsNumber = document.querySelector('#capacity');
+  var selectedIndex = guestsNumber.options['selectedIndex'];
+  if (guestsNumber[selectedIndex].hasAttribute('disabled')) {
+    guestsNumber.setCustomValidity('Please select valid number of guests.');
+  } else {
+    guestsNumber.setCustomValidity('');
+  }
+});
+
+var resetForm = document.querySelector('.form__reset');
+
+resetForm.addEventListener('click', function () {
+  var form = document.querySelector('.notice__form');
+  disableFieldsets();
+  hidePopup();
+  hidePins();
+  map.classList.add('map--faded');
+  form.classList.add('notice__form--disabled');
 });
