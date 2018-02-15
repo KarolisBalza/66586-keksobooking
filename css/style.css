@@ -854,3 +854,7 @@ textarea:focus
 {
     background-position: -10px -10px;
 }
+
+ .map__pin.active::after {
+   background-position: 0 -88px;
+ }

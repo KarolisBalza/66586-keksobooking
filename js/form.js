@@ -6,11 +6,10 @@
   submitButton.addEventListener('click', function () {
     var guestsNumber = document.querySelector('#capacity');
     var selectedIndex = guestsNumber.options['selectedIndex'];
-    if (guestsNumber[selectedIndex].hasAttribute('disabled')) {
-      guestsNumber.setCustomValidity('Please select valid number of guests.');
-    } else {
-      guestsNumber.setCustomValidity('');
-    }
+    var invalid = ('Please select valid number of guests.');
+    var valid = ('');
+    var validation = guestsNumber[selectedIndex].hasAttribute('disabled') ? invalid : valid;
+    guestsNumber.setCustomValidity(validation);
   });
 
   var resetForm = document.querySelector('.form__reset');

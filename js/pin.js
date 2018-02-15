@@ -28,6 +28,7 @@
       mapCard.remove();
     }
     var cardFragment = document.createDocumentFragment();
+
     cardFragment.appendChild(window.renderCard(offerNumber));
     map.insertBefore(cardFragment, document.querySelector('.map__filters-container'));
   };

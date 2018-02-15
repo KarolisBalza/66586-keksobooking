@@ -42,6 +42,13 @@
 
   allPins.addEventListener('click', function (evt) {
     if (evt.path[1].hasAttribute('pin-number')) {
+      var pinsArray = allPins.querySelectorAll('.map__pin');
+      for (var i = 0; i < allPins.querySelectorAll('.map__pin').length; i++) {
+        if (pinsArray[i].classList.contains('active')) {
+          pinsArray[i].classList.remove('active');
+        }
+      }
+      evt.path[1].classList.add('active');
       window.showPinInfo(evt.path[1].getAttribute('pin-number'));
     }
   });
