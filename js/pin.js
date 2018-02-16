@@ -2,8 +2,8 @@
 
 (function () {
 
-  var AVATAR_HEIGHT = 40;
-  var AVATAR_WIDTH = 40;
+  var AVATAR_HEIGHT = 70;
+  var AVATAR_WIDTH = 50;
   var OFFERS_COUNT = 8;
   var map = document.querySelector('.map');
 
