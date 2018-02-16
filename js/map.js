@@ -3,16 +3,72 @@
 (function () {
 
   var ESC_KEYCODE = 27;
+  var MAIN_PIN_WIDTH = 50;
+  var MAIN_PIN_HEIGHT = 84;
+  var TOP_BORDER = 60;
+  var BOTTOM_BORDER = 660;
+  var LEFT_BORDER = 0;
+  var RIGHT_BORDER = 1200;
   var map = document.querySelector('.map');
 
   var mainPin = document.querySelector('.map__pin--main');
-  mainPin.addEventListener('mouseup', function (evt) {
+
+  mainPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
+
+      if (mainPin.offsetTop - shift.y >= BOTTOM_BORDER) {
+        mainPin.style.top = BOTTOM_BORDER + 'px';
+      }
+      if (mainPin.offsetTop - shift.y <= TOP_BORDER) {
+        mainPin.style.top = TOP_BORDER + 'px';
+      }
+      if (mainPin.offsetLeft - shift.x <= LEFT_BORDER) {
+        mainPin.style.left = LEFT_BORDER + 'px';
+      }
+      if (mainPin.offsetLeft - shift.x >= RIGHT_BORDER) {
+        mainPin.style.left = RIGHT_BORDER + 'px';
+      }
+
+      mainPin.style.top = (mainPin.offsetTop - shift.y) + 'px';
+      mainPin.style.left = (mainPin.offsetLeft - shift.x) + 'px';
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  mainPin.addEventListener('mouseup', function () {
     var address = document.querySelector('#address');
     activatePage();
     enableFieldsets();
     showPins();
     setAvailableGuests();
-    address.value = (evt.clientX + ', ' + evt.clientY);
+    address.value = ((mainPin.offsetLeft + MAIN_PIN_WIDTH / 2) + ', ' + (mainPin.offsetTop + MAIN_PIN_HEIGHT));
   });
 
   window.disableFieldsets = function () {
