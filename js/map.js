@@ -37,17 +37,21 @@
     map.classList.remove('map--faded');
   };
 
+  var removeActive = function () {
+    var pinsArray = allPins.querySelectorAll('.map__pin');
+    for (var i = 0; i < allPins.querySelectorAll('.map__pin').length; i++) {
+      if (pinsArray[i].classList.contains('active')) {
+        pinsArray[i].classList.remove('active');
+      }
+    }
+  };
+
 
   var allPins = document.querySelector('.map__pins');
 
   allPins.addEventListener('click', function (evt) {
     if (evt.path[1].hasAttribute('pin-number')) {
-      var pinsArray = allPins.querySelectorAll('.map__pin');
-      for (var i = 0; i < allPins.querySelectorAll('.map__pin').length; i++) {
-        if (pinsArray[i].classList.contains('active')) {
-          pinsArray[i].classList.remove('active');
-        }
-      }
+      removeActive();
       evt.path[1].classList.add('active');
       window.showPinInfo(evt.path[1].getAttribute('pin-number'));
     }
@@ -85,12 +89,14 @@
     document.querySelector('popup__close');
     if (evt.target.classList.contains('popup__close')) {
       window.hidePopup();
+      removeActive();
     }
   });
 
   map.addEventListener('keydown', function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
       window.hidePopup();
+      removeActive();
     }
   });
 
