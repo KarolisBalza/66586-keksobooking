@@ -3,6 +3,7 @@
 (function () {
   var submitButton = document.querySelector('.form__submit');
   var form = document.querySelector('.notice__form');
+  var uploadURL = 'https://js.dump.academy/keksobooking';
 
   submitButton.addEventListener('click', function (evt) {
     var guestsNumber = document.querySelector('#capacity');
@@ -12,8 +13,7 @@
     var validation = guestsNumber[selectedIndex].hasAttribute('disabled') ? invalid : valid;
     guestsNumber.setCustomValidity(validation);
     if (!guestsNumber[selectedIndex].hasAttribute('disabled')) {
-      window.upload(new FormData(form), successHandler, errorHandler);
-
+      window.setup('POST', new FormData(form), successHandler, errorHandler, uploadURL);
       evt.preventDefault();
     }
   });

@@ -9,6 +9,7 @@
   var BOTTOM_BORDER = 660;
   var LEFT_BORDER = 0;
   var RIGHT_BORDER = 1200;
+  var downloadURL = 'https://js.dump.academy/keksobooking/data';
 
   window.offers = [];
 
@@ -67,7 +68,7 @@
 
   mainPin.addEventListener('mouseup', function () {
     var address = document.querySelector('#address');
-    window.load(successHandler, errorHandler);
+    window.setup('GET', '', successHandler, errorHandler, downloadURL);
     activatePage();
     enableFieldsets();
     showPins();
