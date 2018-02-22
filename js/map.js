@@ -9,7 +9,6 @@
   var BOTTOM_BORDER = 660;
   var LEFT_BORDER = 0;
   var RIGHT_BORDER = 1200;
-  var DEBOUNCE_INTERVAL = 500;
   var downloadURL = 'https://js.dump.academy/keksobooking/data';
 
   window.offers = [];
@@ -29,28 +28,32 @@
   var featuresConditioner = document.querySelector('#filter-conditioner');
 
   houseType.addEventListener('change', function () {
-    debounce(filterOffers);
+    window.debounce(filterOffers);
   });
   housePrice.addEventListener('change', function () {
-    debounce(filterOffers);
+    window.debounce(filterOffers);
   });
   houseRooms.addEventListener('change', function () {
-    debounce(filterOffers);
+    window.debounce(filterOffers);
   });
   houseGuests.addEventListener('change', function () {
-    debounce(filterOffers);
+    window.debounce(filterOffers);
   });
   housingFeatures.addEventListener('change', function () {
-    debounce(filterOffers);
+    window.debounce(filterOffers);
   });
 
-  var filterOffers = function () {
+  var filterType = function () {
     filter = window.offers.filter(function (offers) {
       if (houseType.value !== 'any') {
         return offers.offer.type === houseType.value;
       }
       return filter;
-    }).filter(function (offers) {
+    });
+  };
+
+  var filterPrice = function (array) {
+    filter = array.filter(function (offers) {
       switch (housePrice.value) {
         case 'any':
           return offers;
@@ -62,17 +65,29 @@
           return offers.offer.price >= 50000;
       }
       return offers;
-    }).filter(function (offers) {
+    });
+  };
+
+  var filterRooms = function (array) {
+    filter = array.filter(function (offers) {
       if (houseRooms.value !== 'any') {
         return offers.offer.rooms === parseInt(houseRooms.value, 10);
       }
       return filter;
-    }).filter(function (offers) {
+    });
+  };
+
+  var filterGuests = function (array) {
+    filter = array.filter(function (offers) {
       if (houseGuests.value !== 'any') {
         return offers.offer.guests === parseInt(houseGuests.value, 10);
       }
       return filter;
-    }).filter(function (offers) {
+    });
+  };
+
+  var filterFeatures = function (array) {
+    filter = array.filter(function (offers) {
       if (featuresWifi.checked) {
         return offers.offer.features.includes('wifi');
       }
@@ -103,15 +118,15 @@
       }
       return offers;
     });
-    window.renderPins(filter);
   };
 
-  var lastTimeout;
-  var debounce = function (fun) {
-    if (lastTimeout) {
-      window.clearTimeout(lastTimeout);
-    }
-    lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
+  var filterOffers = function () {
+    filterType(filter);
+    filterPrice(filter);
+    filterFeatures(filter);
+    filterRooms(filter);
+    filterGuests(filter);
+    window.renderPins(filter);
   };
 
 
@@ -169,14 +184,20 @@
   });
 
   mainPin.addEventListener('mouseup', function () {
-    var address = document.querySelector('#address');
-    window.setup('GET', '', successHandler, errorHandler, downloadURL);
+    if (window.offers.length <= 0) {
+      window.setup('GET', '', successHandler, errorHandler, downloadURL);
+    }
     activatePage();
     enableFieldsets();
     showPins();
     setAvailableGuests();
-    address.value = ((mainPin.offsetLeft + MAIN_PIN_WIDTH / 2) + ', ' + (mainPin.offsetTop + MAIN_PIN_HEIGHT));
+    window.setAddress();
   });
+
+  window.setAddress = function () {
+    var address = document.querySelector('#address');
+    address.value = ((mainPin.offsetLeft + MAIN_PIN_WIDTH / 2) + ', ' + (mainPin.offsetTop + MAIN_PIN_HEIGHT));
+  };
 
   window.disableFieldsets = function () {
     var fieldsets = document.querySelectorAll('.notice__form fieldset');
