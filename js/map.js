@@ -9,9 +9,111 @@
   var BOTTOM_BORDER = 660;
   var LEFT_BORDER = 0;
   var RIGHT_BORDER = 1200;
+  var DEBOUNCE_INTERVAL = 500;
   var downloadURL = 'https://js.dump.academy/keksobooking/data';
 
   window.offers = [];
+  var filter = [];
+
+
+  var houseType = document.querySelector('#housing-type');
+  var housePrice = document.querySelector('#housing-price');
+  var houseRooms = document.querySelector('#housing-rooms');
+  var houseGuests = document.querySelector('#housing-guests');
+  var housingFeatures = document.querySelector('#housing-features');
+  var featuresWifi = document.querySelector('#filter-wifi');
+  var featuresDishwasher = document.querySelector('#filter-dishwasher');
+  var featuresParking = document.querySelector('#filter-parking');
+  var featuresWasher = document.querySelector('#filter-washer');
+  var featuresElevator = document.querySelector('#filter-elevator');
+  var featuresConditioner = document.querySelector('#filter-conditioner');
+
+  houseType.addEventListener('change', function () {
+    debounce(filterOffers);
+  });
+  housePrice.addEventListener('change', function () {
+    debounce(filterOffers);
+  });
+  houseRooms.addEventListener('change', function () {
+    debounce(filterOffers);
+  });
+  houseGuests.addEventListener('change', function () {
+    debounce(filterOffers);
+  });
+  housingFeatures.addEventListener('change', function () {
+    debounce(filterOffers);
+  });
+
+  var filterOffers = function () {
+    filter = window.offers.filter(function (offers) {
+      if (houseType.value !== 'any') {
+        return offers.offer.type === houseType.value;
+      }
+      return filter;
+    }).filter(function (offers) {
+      switch (housePrice.value) {
+        case 'any':
+          return offers;
+        case 'middle':
+          return offers.offer.price >= 10000 && offers.offer.price <= 50000;
+        case 'low':
+          return offers.offer.price <= 10000;
+        case 'high':
+          return offers.offer.price >= 50000;
+      }
+      return offers;
+    }).filter(function (offers) {
+      if (houseRooms.value !== 'any') {
+        return offers.offer.rooms === parseInt(houseRooms.value, 10);
+      }
+      return filter;
+    }).filter(function (offers) {
+      if (houseGuests.value !== 'any') {
+        return offers.offer.guests === parseInt(houseGuests.value, 10);
+      }
+      return filter;
+    }).filter(function (offers) {
+      if (featuresWifi.checked) {
+        return offers.offer.features.includes('wifi');
+      }
+      return offers;
+    }).filter(function (offers) {
+      if (featuresDishwasher.checked) {
+        return offers.offer.features.includes('dishwasher');
+      }
+      return offers;
+    }).filter(function (offers) {
+      if (featuresParking.checked) {
+        return offers.offer.features.includes('parking');
+      }
+      return offers;
+    }).filter(function (offers) {
+      if (featuresWasher.checked) {
+        return offers.offer.features.includes('washer');
+      }
+      return offers;
+    }).filter(function (offers) {
+      if (featuresElevator.checked) {
+        return offers.offer.features.includes('elevator');
+      }
+      return offers;
+    }).filter(function (offers) {
+      if (featuresConditioner.checked) {
+        return offers.offer.features.includes('conditioner');
+      }
+      return offers;
+    });
+    window.renderPins(filter);
+  };
+
+  var lastTimeout;
+  var debounce = function (fun) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
+  };
+
 
   var map = document.querySelector('.map');
 
@@ -180,6 +282,7 @@
     }
   });
 
+
   var roomNumber = document.querySelector('#room_number');
 
   roomNumber.addEventListener('change', function () {
@@ -259,7 +362,10 @@
 
   var successHandler = function (offersArray) {
     window.offers = offersArray;
-    window.renderPins();
+    for (var i = 0; i < window.offers.length; i++) {
+      window.offers[i].index = i;
+    }
+    window.renderPins(offersArray);
   };
 
   var errorHandler = function (response) {
