@@ -223,7 +223,7 @@
 
   var removeActive = function () {
     var pinsArray = allPins.querySelectorAll('.map__pin');
-    for (var i = 0; i < allPins.querySelectorAll('.map__pin').length; i++) {
+    for (var i = 0; i < pinsArray.length; i++) {
       if (pinsArray[i].classList.contains('active')) {
         pinsArray[i].classList.remove('active');
       }

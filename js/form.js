@@ -6,27 +6,40 @@
   var map = document.querySelector('.map');
   var form = document.querySelector('.notice__form');
   var submitButton = form.querySelector('.form__submit');
-  var title = form.querySelector('#title');
-  var price = form.querySelector('#price');
+  var resetForm = form.querySelector('.form__reset');
   var mainPin = map.querySelector('.map__pin--main');
   var uploadURL = 'https://js.dump.academy/keksobooking';
 
   submitButton.addEventListener('click', function (evt) {
+    if (isGuestsNumberValid() && isTitleValid() && isPriceValid()) {
+      window.setup('POST', new FormData(form), successHandler, errorHandler, uploadURL);
+      evt.preventDefault();
+    }
+  });
+
+  var isTitleValid = function () {
+    var title = form.querySelector('#title');
+    var isValid = title.value.length >= title.minLength;
+    return isValid;
+  };
+
+  var isPriceValid = function () {
+    var price = form.querySelector('#price');
+    var isValid = parseInt(price.min, 10) <= parseInt(price.value, 10) && parseInt(price.value, 10) <= parseInt(price.max, 10);
+    return isValid;
+  };
+
+  var isGuestsNumberValid = function () {
     var guestsNumber = form.querySelector('#capacity');
     var selectedIndex = guestsNumber.options['selectedIndex'];
     var invalid = ('Please select valid number of guests.');
     var valid = ('');
-    var validation = guestsNumber[selectedIndex].hasAttribute('disabled') ? invalid : valid;
+    var isValid = !guestsNumber[selectedIndex].hasAttribute('disabled');
+    var validation = isValid ? valid : invalid;
     guestsNumber.setCustomValidity(validation);
-    if (!guestsNumber[selectedIndex].hasAttribute('disabled') && title.value.length >= title.minLength && title.value.length <= title.maxLength && price.value >= price.min) {
-      window.setup('POST', new FormData(form), successHandler, errorHandler, uploadURL);
-      evt.preventDefault();
+    return isValid;
+  };
 
-    }
-  });
-
-
-  var resetForm = document.querySelector('.form__reset');
 
   resetForm.addEventListener('click', function () {
     window.disableFieldsets();

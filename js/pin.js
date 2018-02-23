@@ -15,8 +15,10 @@
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < array.length; i++) {
       var element = similarElement.cloneNode(true);
+      var locationX = 'left: ' + (array[i].location.x - AVATAR_WIDTH / 2) + 'px; ';
+      var locationY = 'top:' + (array[i].location.y - AVATAR_HEIGHT) + 'px';
       element.querySelector('img').setAttribute('src', array[i].author.avatar);
-      element.setAttribute('style', 'left: ' + (array[i].location.x - AVATAR_WIDTH / 2) + 'px; ' + 'top:' + (array[i].location.y - AVATAR_HEIGHT) + 'px');
+      element.setAttribute('style', locationX + locationY);
       element.setAttribute('pin-number', array[i].index);
       fragment.appendChild(element);
     }
