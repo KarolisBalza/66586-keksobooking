@@ -91,28 +91,18 @@
       if (featuresWifi.checked) {
         return offers.offer.features.includes('wifi');
       }
-      return offers;
-    }).filter(function (offers) {
       if (featuresDishwasher.checked) {
         return offers.offer.features.includes('dishwasher');
       }
-      return offers;
-    }).filter(function (offers) {
       if (featuresParking.checked) {
         return offers.offer.features.includes('parking');
       }
-      return offers;
-    }).filter(function (offers) {
       if (featuresWasher.checked) {
         return offers.offer.features.includes('washer');
       }
-      return offers;
-    }).filter(function (offers) {
       if (featuresElevator.checked) {
         return offers.offer.features.includes('elevator');
       }
-      return offers;
-    }).filter(function (offers) {
       if (featuresConditioner.checked) {
         return offers.offer.features.includes('conditioner');
       }
