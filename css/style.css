@@ -735,7 +735,20 @@ textarea:focus
 
 .form__photo-container
 {
-    width: 140px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.form__photo-container .upload {
+  width: 140px;
+}
+
+.form__photo {
+  padding-left:  10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .form__element--submit
@@ -857,4 +870,13 @@ textarea:focus
 
  .map__pin.active::after {
    background-position: 0 -88px;
+ }
+
+ .sortable__item {
+   list-style: none;
+   padding-bottom: 5px;
+ }
+
+ .sortable__pic {
+   margin-left: 20px;
  }

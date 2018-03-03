@@ -9,6 +9,12 @@
   var BOTTOM_BORDER = 660;
   var LEFT_BORDER = 0;
   var RIGHT_BORDER = 1200;
+  var LOW_PRICE = 10000;
+  var HIGH_PRICE = 50000;
+  var BUNGALO_MIN_PRICE = 0;
+  var FLAT_MIN_PRICE = 1000;
+  var HOUSE_MIN_PRICE = 5000;
+  var PALACE_MIN_PRICE = 10000;
   var downloadURL = 'https://js.dump.academy/keksobooking/data';
 
   window.offers = [];
@@ -58,11 +64,11 @@
         case 'any':
           return offers;
         case 'middle':
-          return offers.offer.price >= 10000 && offers.offer.price <= 50000;
+          return offers.offer.price >= LOW_PRICE && offers.offer.price <= HIGH_PRICE;
         case 'low':
-          return offers.offer.price <= 10000;
+          return offers.offer.price <= LOW_PRICE;
         case 'high':
-          return offers.offer.price >= 50000;
+          return offers.offer.price >= HIGH_PRICE;
       }
       return offers;
     });
@@ -184,25 +190,25 @@
     window.setAddress();
   });
 
+  var address = document.querySelector('#address');
   window.setAddress = function () {
-    var address = document.querySelector('#address');
     address.value = ((mainPin.offsetLeft + MAIN_PIN_WIDTH / 2) + ', ' + (mainPin.offsetTop + MAIN_PIN_HEIGHT));
   };
 
+  var form = document.querySelector('.notice__form');
+  var fieldsets = form.querySelectorAll('fieldset');
+
   window.disableFieldsets = function () {
-    var fieldsets = document.querySelectorAll('.notice__form fieldset');
-    for (var i = 0; i < fieldsets.length; i++) {
-      fieldsets[i].setAttribute('disabled', true);
-    }
+    fieldsets.forEach(function (element) {
+      element.setAttribute('disabled', true);
+    });
   };
 
   var enableFieldsets = function () {
-    var form = document.querySelector('.notice__form');
-    var fieldsets = form.querySelectorAll('.notice__form fieldset');
     form.classList.remove('notice__form--disabled');
-    for (var i = 0; i < fieldsets.length; i++) {
-      fieldsets[i].removeAttribute('disabled');
-    }
+    fieldsets.forEach(function (element) {
+      element.removeAttribute('disabled');
+    });
   };
 
   window.disableFieldsets();
@@ -212,12 +218,12 @@
   };
 
   var removeActive = function () {
-    var pinsArray = allPins.querySelectorAll('.map__pin');
-    for (var i = 0; i < pinsArray.length; i++) {
-      if (pinsArray[i].classList.contains('active')) {
-        pinsArray[i].classList.remove('active');
+    var pins = allPins.querySelectorAll('.map__pin');
+    pins.forEach(function (element) {
+      if (element.classList.contains('active')) {
+        element.classList.remove('active');
       }
-    }
+    });
   };
 
 
@@ -240,21 +246,17 @@
 
 
   window.hidePins = function () {
-    var pins = document.querySelectorAll('.map__pin');
-    for (var i = 0; i < pins.length; i++) {
-      if (!pins[i].classList.contains('map__pin--main')) {
-        pins[i].classList.add('hidden');
-      }
-    }
+    var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    pins.forEach(function (element) {
+      element.classList.add('hidden');
+    });
   };
 
   var showPins = function () {
-    var pins = document.querySelectorAll('.map__pin');
-    for (var i = 0; i < pins.length; i++) {
-      if (!pins[i].classList.contains('map__pin--main')) {
-        pins[i].classList.remove('hidden');
-      }
-    }
+    var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    pins.forEach(function (element) {
+      element.classList.remove('hidden');
+    });
   };
 
 
@@ -279,16 +281,16 @@
     var homePrice = document.querySelector('#price');
     switch (homeType.value) {
       case 'flat':
-        homePrice.setAttribute('min', 1000);
+        homePrice.setAttribute('min', FLAT_MIN_PRICE);
         break;
       case 'bungalo':
-        homePrice.setAttribute('min', 0);
+        homePrice.setAttribute('min', BUNGALO_MIN_PRICE);
         break;
       case 'house':
-        homePrice.setAttribute('min', 5000);
+        homePrice.setAttribute('min', HOUSE_MIN_PRICE);
         break;
       case 'palace':
-        homePrice.setAttribute('min', 10000);
+        homePrice.setAttribute('min', PALACE_MIN_PRICE);
         break;
     }
   });
@@ -336,35 +338,29 @@
   };
 
   var checkinTime = document.querySelector('#timein');
+  var checkoutTime = document.querySelector('#timeout');
+
   checkinTime.addEventListener('change', function () {
-    checkinTime = document.querySelector('#timein');
-    switch (checkinTime.value) {
-      case '12:00':
-        checkoutTime.selectedIndex = 0;
-        break;
-      case '13:00':
-        checkoutTime.selectedIndex = 1;
-        break;
-      case '14:00':
-        checkoutTime.selectedIndex = 2;
-        break;
-    }
+    setTime(checkinTime, checkoutTime);
   });
 
-  var checkoutTime = document.querySelector('#timeout');
   checkoutTime.addEventListener('change', function () {
-    switch (checkoutTime.value) {
+    setTime(checkoutTime, checkinTime);
+  });
+
+  var setTime = function (changedTime, timeToChange) {
+    switch (changedTime.value) {
       case '12:00':
-        checkinTime.selectedIndex = 0;
+        timeToChange.selectedIndex = 0;
         break;
       case '13:00':
-        checkinTime.selectedIndex = 1;
+        timeToChange.selectedIndex = 1;
         break;
       case '14:00':
-        checkinTime.selectedIndex = 2;
+        timeToChange.selectedIndex = 2;
         break;
     }
-  });
+  };
 
   var capacity = document.querySelector('#capacity');
   capacity.addEventListener('change', function () {
